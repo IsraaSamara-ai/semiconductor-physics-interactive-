@@ -641,75 +641,37 @@ def plot_band_gap(material):
 
 
 def plot_iv_curve(material, v_point=0):
-    """منحنى العلاقة بين التيار والجهد للثنائي البلوري"""
     barrier = 0.7 if material == "Si" else 0.3
-    Is = 1e-9  # Saturated reverse current
-    Vt = 0.026  # Thermal voltage at room temp
-
-    # Forward
+    Is = 1e-9
+    Vt = 0.026
     vf = np.linspace(0, 1.2, 300)
     If = Is * (np.exp(vf / Vt) - 1)
-    If_ma = If * 1000  # Convert to mA
-    If_ma = np.clip(If_ma, 0, 100)
-
-    # Reverse
+    If_ma = np.clip(If * 1000, 0, 100)
     vr = np.linspace(0, -20, 200)
     Ir = Is * (np.exp(vr / Vt) - 1)
-    Ir_ua = Ir * 1e6  # Convert to µA
-    Ir_ua = np.clip(Ir_ua, -5, 0)
-
+    Ir_ua = np.clip(Ir * 1e6, -5, 0)
     mat_name = "السليكون (Si)" if material == "Si" else "الجرمانيوم (Ge)"
     color_f = '#00e5ff' if material == 'Si' else '#ff9600'
-
+    title_text = 'منحنى I-V للثنائي البلوري — ' + mat_name
     fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=vf, y=If_ma, mode='lines',
-        line=dict(color=color_f, width=2.5),
-        name=f'انحياز أمامي ({mat_name})'
-    ))
-    fig.add_trace(go.Scatter(
-        x=vr, y=Ir_ua, mode='lines',
-        line=dict(color='#ff4466', width=2, dash='dash'),
-        name='انحياز عكسي'
-    ))
-
-    # Barrier voltage marker
+    fig.add_trace(go.Scatter(x=vf, y=If_ma, mode='lines', line=dict(color=color_f, width=2.5), name='انحياز أمامي'))
+    fig.add_trace(go.Scatter(x=vr, y=Ir_ua, mode='lines', line=dict(color='#ff4466', width=2, dash='dash'), name='انحياز عكسي'))
     fig.add_vline(x=barrier, line_dash='dot', line_color='#ffcc00', line_width=1.5)
-    fig.add_annotation(x=barrier, y=max(If_ma) * 0.5,
-                       text=f'حاجز الجهد = {barrier} V',
-                       font=dict(size=13, color='#ffcc00', family='Cairo'),
-                       showarrow=True, arrowhead=1, ax=-80, ay=0)
-
-    # Interactive point
+    barrier_text = 'حاجز الجهد = ' + str(barrier) + ' V'
+    fig.add_annotation(x=barrier, y=max(If_ma) * 0.5, text=barrier_text, font=dict(size=13, color='#ffcc00', family='Cairo'), showarrow=True, arrowhead=1, ax=-80, ay=0)
     if v_point >= 0:
-        i_at_v = Is * (np.exp(min(v_point, 1.2) / Vt) - 1) * 1000
-        i_at_v = min(i_at_v, 100)
-        fig.add_trace(go.Scatter(
-            x=[v_point], y=[i_at_v], mode='markers+text',
-            marker=dict(size=12, color='#ffffff', symbol='diamond'),
-            text=[f'({v_point:.1f}V, {i_at_v:.1f}mA)'],
-            textposition='top left', textfont=dict(size=11, color='#ffffff', family='Cairo'),
-            showlegend=False
-        ))
+        i_at_v = min(Is * (np.exp(min(v_point, 1.2) / Vt) - 1) * 1000, 100)
+        point_text = '(' + str(round(v_point, 1)) + 'V, ' + str(round(i_at_v, 1)) + 'mA)'
+        fig.add_trace(go.Scatter(x=[v_point], y=[i_at_v], mode='markers+text', marker=dict(size=12, color='#ffffff', symbol='diamond'), text=[point_text], textposition='top left', textfont=dict(size=11, color='#ffffff', family='Cairo'), showlegend=False))
     elif v_point < 0:
         i_at_v = Is * (np.exp(max(v_point, -20) / Vt) - 1) * 1e6
-        fig.add_trace(go.Scatter(
-            x=[v_point], y=[i_at_v], mode='markers+text',
-            marker=dict(size=12, color='#ffffff', symbol='diamond'),
-            text=[f'({v_point:.1f}V, {i_at_v:.2f}µA)'],
-            textposition='bottom left', textfont=dict(size=11, color='#ffffff', family='Cairo'),
-            showlegend=False
-        ))
-
+        point_text = '(' + str(round(v_point, 1)) + 'V, ' + str(round(i_at_v, 2)) + 'uA)'
+        fig.add_trace(go.Scatter(x=[v_point], y=[i_at_v], mode='markers+text', marker=dict(size=12, color='#ffffff', symbol='diamond'), text=[point_text], textposition='bottom left', textfont=dict(size=11, color='#ffffff', family='Cairo'), showlegend=False))
     fig.update_layout(
-        title=dict(text=f'منحنى (I-V) للثنائي البلوري — {mat_name}', font=dict(size=18, color='#00e5ff', family='Cairo')),
+        title=dict(text=title_text, font=dict(size=18, color='#00e5ff', family='Cairo')),
         plot_bgcolor='#0a0a1a', paper_bgcolor='#0a0a1a',
-        xaxis=dict(title=dict(text='فرق الجهد (V)', font=dict(size=13, color='#aaa', family='Cairo')),
-                   gridcolor='#1a1a3a', zerolinecolor='#333355', range=[-15, 1.5],
-                   titlefont=dict(family='Cairo')),
-        yaxis=dict(title=dict(text='التيار', font=dict(size=13, color='#aaa', family='Cairo')),
-                   gridcolor='#1a1a3a', zerolinecolor='#333355',
-                   titlefont=dict(family='Cairo')),
+        xaxis=dict(title=dict(text='فرق الجهد (V)', font=dict(size=13, color='#aaa', family='Cairo')), gridcolor='#1a1a3a', zerolinecolor='#333355', range=[-15, 1.5], titlefont=dict(family='Cairo')),
+        yaxis=dict(title=dict(text='التيار', font=dict(size=13, color='#aaa', family='Cairo')), gridcolor='#1a1a3a', zerolinecolor='#333355', titlefont=dict(family='Cairo')),
         height=420, margin=dict(t=60, b=60, l=60, r=40),
         legend=dict(font=dict(size=12, family='Cairo', color='#aaa'), bgcolor='#0a0a1a88'),
         font=dict(family='Cairo', color='#aaa')
