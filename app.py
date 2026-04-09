@@ -64,15 +64,14 @@ st.markdown("""
 # ═══════════════════════════════════════════════════════════════════════
 
 def html_lattice(temperature, material):
-    """رسوم متحركة لبلورة السليكون مع تأثير الحرارة"""
     n_pairs = min(int(temperature / 8), 12)
-    return f"""
+    js = """
     <div style="direction:rtl;text-align:center;font-family:Cairo,sans-serif;">
     <canvas id="lc" width="780" height="380"
       style="border-radius:12px;background:#08081a;border:1px solid #00e5ff15;display:block;margin:0 auto;"></canvas>
     <script>
     const cv=document.getElementById('lc'),cx=cv.getContext('2d');
-    const np={n_pairs},mat="{material}";
+    const np=__NP__,mat="__MAT__";
     const atoms=[];
     for(let r=0;r<4;r++)for(let c=0;c<7;c++)
       atoms.push({x:65+c*105,y:55+r*90,vx:0,vy:0});
@@ -86,15 +85,15 @@ def html_lattice(temperature, material):
     while(broken.size<np&&broken.size<bonds.length)
       broken.add(Math.floor(Math.random()*bonds.length));
     const elec=[],holes=[];
-    broken.forEach(bi=>{{
+    broken.forEach(bi=>{
       const b=bonds[bi];
       const mx=(atoms[b[0]].x+atoms[b[1]].x)/2;
       const my=(atoms[b[0]].y+atoms[b[1]].y)/2;
-      elec.push({{x:mx+Math.random()*20-10,y:my+Math.random()*20-10,
-        vx:(Math.random()-0.5)*2,vy:(Math.random()-0.5)*2}});
-      holes.push({{x:mx-Math.random()*20+10,y:my-Math.random()*20+10,
-        vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5}});
-    }});
+      elec.push({x:mx+Math.random()*20-10,y:my+Math.random()*20-10,
+        vx:(Math.random()-0.5)*2,vy:(Math.random()-0.5)*2});
+      holes.push({x:mx-Math.random()*20+10,y:my-Math.random()*20+10,
+        vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5});
+    });
     function draw(){{
       cx.clearRect(0,0,780,380);
       bonds.forEach((b,i)=>{{
@@ -122,7 +121,7 @@ def html_lattice(temperature, material):
         cx.beginPath();cx.arc(e.x,e.y,5,0,Math.PI*2);cx.fill();
         cx.shadowBlur=0;
         cx.fillStyle='#ffffff';cx.font='9px Cairo';
-        cx.fillText('e⁻',e.x,e.y-10);
+        cx.fillText('e-',e.x,e.y-10);
       }});
       holes.forEach(h=>{{
         h.x+=h.vx;h.y+=h.vy;
@@ -144,6 +143,8 @@ def html_lattice(temperature, material):
     }}
     setInterval(draw,33);
     </script></div>"""
+    js = js.replace("__NP__", str(n_pairs)).replace("__MAT__", material)
+    return js
 
 
 def html_doping(dtype, dopant):
