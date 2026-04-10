@@ -593,10 +593,13 @@ def plot_band_gap(material):
 
     fig = go.Figure()
     # Valence band
+    fig = go.Figure()
+    # Valence band
     fig.add_trace(go.Scatter(
-        x=[-1, 0, 1, 2, 3, 4, 5], y=[-0.3, -0.1, 0, 0, 0, -0.1, -0.3],
-        fill='tozeroy', fillcolor='rgba(255,70,100,0.2)',
-        line=dict(color='#ff4466', width=2), name='نطاق التكافؤ'
+    x=[-1, 0, 1, 2, 3, 4, 5], y=[-0.3, -0.1, 0, 0, 0, -0.1, -0.3],
+    fill='tozeroy', fillcolor='rgba(255,70,100,0.2)',
+    line=dict(color='rgba(255, 0, 0, 0.5)', width=2),
+    name='نطاق التكافؤ'
     ))
     # Conduction band
     fig.add_trace(go.Scatter(
