@@ -591,9 +591,7 @@ def plot_band_gap(material):
         color_fill = "rgba(255,150,0,0.15)"
         color_line = "#ff9600"
 
-    fig = go.Figure()
-    # Valence band
-    fig = go.Figure()
+fig = go.Figure()
     # Valence band
     fig.add_trace(go.Scatter(
     x=[-1, 0, 1, 2, 3, 4, 5], y=[-0.3, -0.1, 0, 0, 0, -0.1, -0.3],
