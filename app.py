@@ -701,7 +701,7 @@ def plot_ac_rectified(vmax, freq):
     # Fill the blocked part
     fig.add_trace(go.Scatter(
         x=t * 1000, y=np.where(v_in < 0, v_in, 0), mode='lines',
-        line=dict(color='rgba(255, 0, 0, 0.5)'), width=1.5, dash='dot'),
+        line=dict(color='rgba(255, 0, 0, 0.5)', width=1.5, dash='dot'),
         fill='tozeroy', fillcolor='rgba(255,68,100,0.1)',
         name='الجزء المحظور'
     ))
